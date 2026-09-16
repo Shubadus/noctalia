@@ -22,7 +22,7 @@ include_line='files = ["noctalia.toml"]'
 mkdir -p "$config_dir"
 
 if [ ! -f "$config_file" ]; then
-    printf '[include]\n%s\n' "$include_line" >"$config_file"
+    printf '[include.optional]\n%s\n' "$include_line" >"$config_file"
     exit 0
 fi
 
@@ -67,7 +67,7 @@ awk '
         open = find_syntax(buf, 1, "[")
         endp = find_syntax(buf, open + 1, "]")
         if (open == 0 || endp == 0 || endp < open) {
-            print "error: include.files must be an array" > "/dev/stderr"
+            print "error: include.optional.files must be an array" > "/dev/stderr"
             exit 2
         }
         head  = substr(buf, 1, open)
@@ -110,7 +110,7 @@ awk '
         next
     }
 
-    /^[[:space:]]*\[include\][[:space:]]*(#.*)?$/ {
+    /^[[:space:]]*\[include\.optional\][[:space:]]*(#.*)?$/ {
         saw_include = 1
         in_include = 1
         print
@@ -126,7 +126,7 @@ awk '
     in_include && /^[[:space:]]*files[[:space:]]*=/ {
         saw_files = 1
         if (find_syntax($0, 1, "[") == 0) {
-            print "error: include.files must be an array" > "/dev/stderr"
+            print "error: include.optional.files must be an array" > "/dev/stderr"
             exit 2
         }
         buf = $0
@@ -148,7 +148,7 @@ awk '
             add_files()
         if (!saw_include) {
             print ""
-            print "[include]"
+            print "[include.optional]"
             add_files()
         }
     }
